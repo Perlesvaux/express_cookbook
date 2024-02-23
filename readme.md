@@ -1,10 +1,14 @@
-### 0 - Installing **Node** and **npm** through **nvm**:
+# Express cookbook!
+By the end of this tutorial you'll have a fully functional TODO List. App name on this example will be Roster, modeled as a roster of Individual objects.
+
+## ***First things first...***
+##### Installing **Node** and **npm** through **nvm**:
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 nvm install 18
 nvm use 18
 ```
-### 1 - Setting up the database:
+##### Setting up the database:
 This example uses **MongoDB Atlas**:
 
 Sign up [here](https://account.mongodb.com/account/register), select *JavaScript* as your preferred programming language. On the *Deploy a cloud database* page, leave this as the default: *M0 Sandbox* (Shared RAM, 512 MB Storage).
@@ -26,7 +30,7 @@ The **connection string** generated below will be used by your express app to in
 mongodb+srv://username:password@cluster0...
 ```
 
-### 2 - Let's initialize the project:
+##### - Let's initialize the project:
 Create a folder and some files. i.e.: 
 ```bash
 mkdir roster
@@ -71,9 +75,11 @@ Finally, install dependencies:
 ```bash
 npm i
 ```
-### 3 - Time to code!:
+## Time to code!:
 Let's edit the `index.js` file:
+
 ```javascript
+// This 'app' instance of Express represents your web application.
 const express = require('express')
 const app = express()
 const port = 3000
@@ -81,6 +87,10 @@ const port = 3000
 // Enable CORS (import module and use it globally)
 const cors = require('cors')
 app.use(cors())
+
+// Configure body-parser
+const bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({extended:false}))
 
 // Connect to Atlas-mongoDB Database
 // - Load .env file contents
@@ -105,10 +115,6 @@ const individualSchema = mongoose.Schema({
 // - this object has all necessary methods to interact with the database
 const Individual = mongoose.model('Individual', individualSchema)
 
-// Configure body-parser
-const bodyParser = require('body-parser')
-app.use(bodyParser.urlencoded({extended:false}))
-
 // This middleware prints the method, path and ip of each request.
 // For illustrative purposes, instead of using it globally, we'll
 // add it to every endpoint individually =)
@@ -117,8 +123,7 @@ function MWLogger (req, res, next){
   next()
 }
 
-
-// *** CRUD starts here! ***
+// *** *** CRUD starts here! *** ***
 // RETRIEVE all entries
 app.get("/roster", MWLogger, async (req, res)=>{
   try {
