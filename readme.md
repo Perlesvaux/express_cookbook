@@ -2,13 +2,13 @@
 By the end of this tutorial you'll have a fully functional TODO List. App name on this example will be Roster, modeled as a roster of Individual objects.
 
 ## ***First things first...***
-##### Installing **Node** and **npm** through **nvm**:
+### Installing **Node** and **npm** through **nvm**:
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 nvm install 18
 nvm use 18
 ```
-##### Setting up the database:
+### Setting up the database:
 This example uses **MongoDB Atlas**:
 
 Sign up [here](https://account.mongodb.com/account/register), select *JavaScript* as your preferred programming language. On the *Deploy a cloud database* page, leave this as the default: *M0 Sandbox* (Shared RAM, 512 MB Storage).
@@ -30,7 +30,7 @@ The **connection string** generated below will be used by your express app to in
 mongodb+srv://username:password@cluster0...
 ```
 
-##### - Let's initialize the project:
+### - Let's initialize the project:
 Create a folder and some files. i.e.: 
 ```bash
 mkdir roster
