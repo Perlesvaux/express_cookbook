@@ -215,9 +215,12 @@ This tool creates a lot of files and configurations for us.
 ```bash
 npm create vite@latest
 ```
-Project name: dashboard
-Select a framework:  *React*
-Select a variant:  *JavaScript*
+
+
+- Project name: dashboard
+- Select a framework:  *React*
+- Select a variant:  *JavaScript*
+
 
 ```bash
 cd dashboard
