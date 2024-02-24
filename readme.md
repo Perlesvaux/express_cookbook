@@ -1,5 +1,5 @@
 # Express cookbook!
-By the end of this tutorial you'll have a fully functional TODO List. App name on this example will be Roster, modeled as a roster of Individual objects.
+By the end of this tutorial you'll have a fully functional TODO List. Web app will be modeled as a 'roster' of 'Individual' objects.
 
 ## ***First things first...***
 ### Installing **Node** and **npm** through **nvm**:
@@ -30,13 +30,13 @@ The **connection string** generated below will be used by your express app to in
 mongodb+srv://username:password@cluster0...
 ```
 
-### - Let's initialize the project:
+## 1 - Let's initialize the project's BACKEND:
 Create a folder and some files. i.e.: 
+
 ```bash
-mkdir roster
-cd roster
-touch .env package.json index.js
+mkdir roster && touch roster/.env roster/package.json roster/index.js
 ```
+
 Let's edit the `.env` file first. Assign the **connection string** to a variable called `MONGO_URI`. (There should be no spaces around the `=` and no need to surround the string in quotation marks.):
 ```bash
 MONGO_URI=mongodb+srv://username:password@cluster0...
@@ -75,7 +75,7 @@ Finally, install dependencies:
 ```bash
 npm i
 ```
-## Time to code!:
+## 2 - Time to code our BACKEND!:
 Let's edit the `index.js` file:
 
 ```javascript
@@ -103,7 +103,6 @@ mongoose = require('mongoose')
 mongoose.connect(mySecret, {useNewUrlParser:true, useUnifiedTopology:true})
 mongoose.set('useFindAndModify', false);
 
-
 // mongose schema modeled after an individual
 // - defines the structure of the document in the MongoDB collection.
 const individualSchema = mongoose.Schema({
@@ -124,6 +123,16 @@ function MWLogger (req, res, next){
 }
 
 // *** *** CRUD starts here! *** ***
+// On the Client side, <input> elements have a 
+// 'name' & 'value' properties. 
+// These correspond to 'key-values' on the 'req.body' 
+// when sending a CREATE or UPDATE request.
+// 
+// When a new entry is created, it gets its own unique ID.  
+// To interact with a specific entry, we define an endpoint 
+// with a URL parameter '/:id'. This parameter can now be accessed
+// through 'req.params.id' when sending a GET, UPDATE or DELETE request
+
 // RETRIEVE all entries
 app.get("/roster", MWLogger, async (req, res)=>{
   try {
@@ -188,22 +197,131 @@ app.put("/roster/:id", MWLogger, async(req, res)=>{
   }
 })
 
-// CRUD Summary:
-// On the Client side, <input> elements have a 
-// 'name' & 'value' properties. 
-// These correspond to 'key-values' on the 'req.body' 
-// when sending a CREATE or UPDATE request.
-// 
-// When a new entry is created, it gets its own unique ID.  
-// To interact with a specific entry, we define an endpoint 
-// with a URL parameter '/:id'. This parameter can now be accessed
-// through 'req.params.id' when sending a GET, UPDATE or DELETE request
 
 //App is ready to go!
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`)
 })
+```
+Testing the above code with **Postman** should work perfectly. Start server like this:
+```bash
+npm start
 
+```
+
+## 3 - Let's initialize the project's FRONTEND (React):
+Create the frontend project next to the backend's directory (i.e.: inside the same parent directory).
+This tool creates a lot of files and configurations for us.
+```bash
+npm create vite@latest
+```
+Project name: dashboard
+Select a framework:  *React*
+Select a variant:  *JavaScript*
+
+```bash
+cd dashboard
+npm install
+```
+## 4 - Time to code the FRONTEND!:
+Now, edit the `src/App.jsx` file:
+
+```javascript
+import { useState , useEffect } from 'react'
+import './App.css'
+
+// Notice how it's the same port the backend is served from
+const hostedFrom = `http://localhost:3000`
+
+export default function App() {
+  const [state, setState] = useState({people:[], userInput:{name:'', age:''}})
+
+  // The react app will have a single <form> to handle CREATE and UPDATE 
+  // Each form <input> will trigger this function below. It dynamically creates
+  // a key-value pair based on the <input> fields: name & value 
+  function setUserInput (e){
+      setState({...state, userInput:{...state.userInput, [e.target.name]:e.target.value}})
+    } 
+
+  // Retrieval of the entire roster
+  async function displayRoster(){
+    try {
+      const response = await fetch(hostedFrom+"/roster")
+      const data = await response.json()    
+      setState({...state, people:data})
+      
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  // Delete a given entry. Notice how roster is re-rendered after fetch succeeds.
+  async function deleteEntry(id){
+    try {
+      await fetch(hostedFrom+`/roster/${id}`, {method: "DELETE"})
+      displayRoster()
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Create a new entry based on userInput. Notice how roster is re-rendered after fetch succeeds.
+  async function confirmNewEntry(e) {
+    e.preventDefault();
+    try {
+      await fetch(hostedFrom+'/roster', {method: "POST", headers: {"Content-Type":"application/x-www-form-urlencoded"}, body: new URLSearchParams(state.userInput)})
+      displayRoster()
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Update a new entry based on userInput. Notice how roster gets re-rendered after fetch succeeds.
+  async function updateEntry(id) {
+    try {
+      await fetch(hostedFrom+`/roster/${id}`, {method: "PUT", headers: {"Content-Type":"application/x-www-form-urlencoded"}, body: new URLSearchParams(state.userInput)})
+      displayRoster()
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Initial roster render
+  useEffect(()=>{
+    displayRoster()
+  }, [])
+
+  return (
+    <>
+      <form onSubmit={confirmNewEntry}>
+        <input type="text" name="name"  onChange={setUserInput} value={state.userInput.name}/>
+        <input type="number" name="age" onChange={setUserInput} value={state.userInput.age}/>
+        <button type="submit">add</button>
+      </form>
+
+      <table>
+      <tbody>
+      {state.people.map(each =>
+        <tr key={each._id}> 
+          <td>{each.name}</td>
+          <td>{each.age}</td>
+          <td> <button onClick={()=>deleteEntry(each._id)}>delete</button> </td>
+          <td> <button onClick={()=>updateEntry(each._id)}>update</button> </td>
+        </tr>
+          )}
+      </tbody>
+      </table>
+    </>
+  )
+}
+
+```
+All set! Start the server like this:
+```bash
+npm run dev
 ```
 
 
