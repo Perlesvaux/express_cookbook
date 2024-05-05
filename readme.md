@@ -2,10 +2,10 @@
 
 - [Installing Node and npm through nvm](#installing-node-and-npm-through-nvm)
 - [Setting up the database](#setting-up-the-database)
-    - [1 - Let's initialize the project's backend](#1---lets-initialize-the-projects-backend)
-    - [2 - Time to code our backend](#2---time-to-code-our-backend)
-    - [3 - Let's initialize the project's frontend]("#3---lets-initialize-the-projects-frontend-react)
-    - [4 - Time to code the frontend](#4---time-to-code-the-frontend)
+- [1 - Let's initialize the project's backend](#1---lets-initialize-the-projects-backend)
+- [2 - Time to code our backend](#2---time-to-code-our-backend)
+- [3 - Let's initialize the project's frontend]("#3---lets-initialize-the-projects-frontend-react)
+- [4 - Time to code the frontend](#4---time-to-code-the-frontend)
 
 By the end of this tutorial you'll have a fully functional TODO List. Web app will be modeled as a 'roster' of 'Individual' objects.
 
